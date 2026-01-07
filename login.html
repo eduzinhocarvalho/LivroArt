@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LivroArt - Login</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #8B4513;
+            --secondary-color: #D2B48C;
+            --accent-color: #A0522D;
+            --text-color: #3E2723;
+            --light-color: #F5F5DC;
+            --dark-color: #5D4037;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --border-radius: 8px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Georgia', serif;
+        }
+
+        body {
+            background-color: var(--light-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect width="100" height="100" fill="%23F5F5DC"/><path d="M0 0L100 100M100 0L0 100" stroke="%23D2B48C" stroke-width="0.5"/></svg>');
+        }
+
+        .container {
+            max-width: 500px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Logo */
+        .logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .logo i {
+            font-size: 3rem;
+            color: var(--primary-color);
+        }
+
+        .logo h1 {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        /* Welcome Message */
+        .welcome-message {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 20px;
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            border-left: 5px solid var(--accent-color);
+        }
+
+        .welcome-message h2 {
+            font-size: 1.8rem;
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+
+        .welcome-message p {
+            font-size: 1.1rem;
+            color: var(--dark-color);
+        }
+
+        /* Login Box */
+        .login-box {
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            padding: 40px;
+            margin-bottom: 30px;
+        }
+
+        .login-box h3 {
+            font-size: 1.5rem;
+            color: var(--primary-color);
+            margin-bottom: 25px;
+            text-align: center;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--secondary-color);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: var(--dark-color);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid var(--secondary-color);
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 3px rgba(160, 82, 45, 0.2);
+        }
+
+        .btn {
+            display: block;
+            width: 100%;
+            background-color: var(--primary-color);
+            color: white;
+            padding: 14px;
+            border: none;
+            border-radius: var(--border-radius);
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        .btn:hover {
+            background-color: var(--accent-color);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+
+        .btn-secondary {
+            background-color: var(--secondary-color);
+            color: var(--text-color);
+        }
+
+        .btn-secondary:hover {
+            background-color: var(--accent-color);
+            color: white;
+        }
+
+        /* Warning Box */
+        .warning-box {
+            background-color: #fff8e1;
+            border-left: 5px solid #ffb74d;
+            border-radius: var(--border-radius);
+            padding: 20px;
+            margin-top: 20px;
+            box-shadow: var(--shadow);
+        }
+
+        .warning-box h4 {
+            color: #ef6c00;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .warning-box p {
+            color: var(--dark-color);
+            font-size: 0.95rem;
+        }
+
+        /* Status Message */
+        .status-message {
+            padding: 15px;
+            border-radius: var(--border-radius);
+            margin-bottom: 20px;
+            text-align: center;
+            display: none;
+        }
+
+        .status-message.success {
+            background-color: #e8f5e9;
+            color: #2e7d32;
+            border: 1px solid #a5d6a7;
+            display: block;
+        }
+
+        .status-message.error {
+            background-color: #ffebee;
+            color: #c62828;
+            border: 1px solid #ef9a9a;
+            display: block;
+        }
+
+        .status-message.info {
+            background-color: #e3f2fd;
+            color: #1565c0;
+            border: 1px solid #90caf9;
+            display: block;
+        }
+
+        /* Login Options */
+        .login-options {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .login-options .btn {
+            flex: 1;
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid var(--secondary-color);
+            width: 100%;
+            color: var(--dark-color);
+            font-size: 0.9rem;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 600px) {
+            .logo h1 {
+                font-size: 2rem;
+            }
+            
+            .logo i {
+                font-size: 2.5rem;
+            }
+            
+            .welcome-message h2 {
+                font-size: 1.5rem;
+            }
+            
+            .login-box {
+                padding: 25px;
+            }
+            
+            .login-options {
+                flex-direction: column;
+            }
+        }
+
+        @media (max-width: 400px) {
+            .logo {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .welcome-message h2 {
+                font-size: 1.3rem;
+            }
+            
+            .login-box h3 {
+                font-size: 1.3rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Logo -->
+        <div class="logo">
+            <i class="fas fa-book-open"></i>
+            <h1>LivroArt</h1>
+        </div>
+
+        <!-- Welcome Message -->
+        <div class="welcome-message">
+            <h2>Comece seu livro aqui no LivroArt!</h2>
+            <p>Faça login e comece a escrever suas ideias!</p>
+        </div>
+
+        <!-- Status Message -->
+        <div id="statusMessage" class="status-message"></div>
+
+        <!-- Login Box -->
+        <div class="login-box">
+            <h3>Entrar no LivroArt</h3>
+            
+            <div class="form-group">
+                <label for="username">Nome de usuário</label>
+                <input type="text" id="username" class="form-control" placeholder="Digite seu nome de usuário">
+            </div>
+            
+            <div class="form-group">
+                <label for="password">Senha</label>
+                <input type="password" id="password" class="form-control" placeholder="Digite sua senha">
+            </div>
+            
+            <div class="login-options">
+                <button class="btn" id="login-btn">Entrar</button>
+                <button class="btn btn-secondary" id="register-btn">Criar Nova Conta</button>
+            </div>
+        </div>
+
+        <!-- Warning Box -->
+        <div class="warning-box">
+            <h4><i class="fas fa-exclamation-triangle"></i> Importante</h4>
+            <p>Ficaremos salvos seu login apenas no seu computador e no seu navegador, então tome cuidado para não perder seus livros! Se você limpar os dados do navegador, perderá o acesso à sua conta e aos seus livros.</p>
+        </div>
+    </div>
+
+    <footer>
+        <p>LivroArt &copy; 2023 - Crie livros personalizados com facilidade</p>
+    </footer>
+
+    <script>
+        // Elementos do DOM
+        const usernameInput = document.getElementById('username');
+        const passwordInput = document.getElementById('password');
+        const loginBtn = document.getElementById('login-btn');
+        const registerBtn = document.getElementById('register-btn');
+        const statusMessage = document.getElementById('statusMessage');
+
+        // Exibir mensagem de status
+        function showStatus(message, type = 'info') {
+            statusMessage.textContent = message;
+            statusMessage.className = `status-message ${type}`;
+            
+            // Limpar mensagem após 5 segundos (exceto para mensagens de sucesso de login)
+            if (type !== 'success') {
+                setTimeout(() => {
+                    statusMessage.className = 'status-message';
+                }, 5000);
+            }
+        }
+
+        // Verificar se já existe um usuário logado
+        function checkExistingLogin() {
+            const savedUser = localStorage.getItem('livroart_user');
+            if (savedUser) {
+                try {
+                    const userData = JSON.parse(savedUser);
+                    showStatus(`Usuário "${userData.username}" encontrado. Faça login para continuar.`, 'info');
+                    usernameInput.value = userData.username;
+                    usernameInput.focus();
+                } catch (e) {
+                    // Dados corrompidos, limpar
+                    localStorage.removeItem('livroart_user');
+                }
+            }
+        }
+
+        // Validar credenciais
+        function validateCredentials(username, password) {
+            if (!username.trim() || !password.trim()) {
+                showStatus('Por favor, preencha todos os campos.', 'error');
+                return false;
+            }
+            
+            if (username.length < 3) {
+                showStatus('Nome de usuário deve ter pelo menos 3 caracteres.', 'error');
+                return false;
+            }
+            
+            if (password.length < 6) {
+                showStatus('Senha deve ter pelo menos 6 caracteres.', 'error');
+                return false;
+            }
+            
+            return true;
+        }
+
+        // Registrar novo usuário
+        function registerUser(username, password) {
+            // Verificar se usuário já existe
+            const existingUsers = JSON.parse(localStorage.getItem('livroart_users')) || [];
+            const userExists = existingUsers.some(user => user.username === username);
+            
+            if (userExists) {
+                showStatus('Nome de usuário já existe. Escolha outro.', 'error');
+                return false;
+            }
+            
+            // Criar novo usuário
+            const newUser = {
+                username: username,
+                password: password, // Em um sistema real, isso seria criptografado
+                id: Date.now(),
+                createdAt: new Date().toISOString(),
+                books: []
+            };
+            
+            // Adicionar à lista de usuários
+            existingUsers.push(newUser);
+            localStorage.setItem('livroart_users', JSON.stringify(existingUsers));
+            
+            // Salvar como usuário atual
+            localStorage.setItem('livroart_user', JSON.stringify({
+                username: username,
+                id: newUser.id,
+                isLoggedIn: false // Ainda não está logado
+            }));
+            
+            showStatus('Conta criada com sucesso! Agora faça login com suas credenciais.', 'success');
+            return true;
+        }
+
+        // Fazer login
+        function loginUser(username, password) {
+            // Buscar usuário
+            const existingUsers = JSON.parse(localStorage.getItem('livroart_users')) || [];
+            const user = existingUsers.find(user => user.username === username);
+            
+            if (!user) {
+                showStatus('Usuário não encontrado. Crie uma conta primeiro.', 'error');
+                return false;
+            }
+            
+            // Verificar senha (em um sistema real, comparar hash)
+            if (user.password !== password) {
+                showStatus('Senha incorreta. Tente novamente.', 'error');
+                return false;
+            }
+            
+            // Salvar sessão do usuário
+            localStorage.setItem('livroart_user', JSON.stringify({
+                username: username,
+                id: user.id,
+                isLoggedIn: true,
+                lastLogin: new Date().toISOString()
+            }));
+            
+            // Salvar dados do usuário atualizado (com última data de login)
+            const updatedUsers = existingUsers.map(u => {
+                if (u.username === username) {
+                    return { ...u, lastLogin: new Date().toISOString() };
+                }
+                return u;
+            });
+            localStorage.setItem('livroart_users', JSON.stringify(updatedUsers));
+            
+            showStatus('Login realizado com sucesso! Redirecionando...', 'success');
+            return true;
+        }
+
+        // Redirecionar para a página principal do LivroArt
+        function redirectToMainApp() {
+            // Adicionar um pequeno delay para mostrar a mensagem de sucesso
+            setTimeout(() => {
+                // Redirecionar para o arquivo principal do LivroArt
+                // Em um ambiente real, isso seria o caminho para o arquivo HTML principal
+                window.location.href = 'livroart.html'; // Altere para o nome do seu arquivo principal
+            }, 1500);
+        }
+
+        // Event Listeners
+        loginBtn.addEventListener('click', () => {
+            const username = usernameInput.value.trim();
+            const password = passwordInput.value.trim();
+            
+            if (!validateCredentials(username, password)) return;
+            
+            if (loginUser(username, password)) {
+                redirectToMainApp();
+            }
+        });
+
+        registerBtn.addEventListener('click', () => {
+            const username = usernameInput.value.trim();
+            const password = passwordInput.value.trim();
+            
+            if (!validateCredentials(username, password)) return;
+            
+            if (registerUser(username, password)) {
+                // Limpar senha após registro bem-sucedido
+                passwordInput.value = '';
+                passwordInput.focus();
+            }
+        });
+
+        // Permitir login com Enter
+        passwordInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                loginBtn.click();
+            }
+        });
+
+        // Inicializar: verificar se já existe um usuário salvo
+        checkExistingLogin();
+        
+        // Focar no campo apropriado
+        if (usernameInput.value) {
+            passwordInput.focus();
+        } else {
+            usernameInput.focus();
+        }
+
+        // Informações sobre o sistema de armazenamento
+        console.log("Sistema de Login LivroArt");
+        console.log("- Credenciais são armazenadas apenas no navegador local");
+        console.log("- Livros são salvos no localStorage do usuário");
+        console.log("- Ao limpar dados do navegador, todas as informações são perdidas");
+    </script>
+</body>
+</html>

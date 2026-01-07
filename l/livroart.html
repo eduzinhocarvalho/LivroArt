@@ -1,0 +1,2362 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LivroArt - Crie seu livro personalizado</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        :root {
+            --primary-color: #8B4513;
+            --secondary-color: #D2B48C;
+            --accent-color: #A0522D;
+            --text-color: #3E2723;
+            --light-color: #F5F5DC;
+            --dark-color: #5D4037;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --border-radius: 8px;
+            --red-color: #dc3545;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Georgia', serif;
+        }
+
+        body {
+            background-color: var(--light-color);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header */
+        header {
+            background-color: var(--primary-color);
+            color: var(--light-color);
+            padding: 1rem 0;
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+        }
+
+        .logo i {
+            font-size: 2rem;
+        }
+
+        .logo h1 {
+            font-size: 1.8rem;
+            font-weight: bold;
+        }
+
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        #user-name {
+            font-weight: bold;
+        }
+
+        #logout-btn, #new-book-btn, .header-duzinho-btn {
+            background: none;
+            border: 1px solid var(--light-color);
+            color: var(--light-color);
+            padding: 5px 15px;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        #logout-btn:hover, #new-book-btn:hover:not(:disabled), .header-duzinho-btn:hover {
+            background-color: var(--light-color);
+            color: var(--primary-color);
+        }
+
+        .header-duzinho-btn {
+            background-color: var(--red-color);
+            border-color: var(--red-color);
+            font-weight: bold;
+        }
+
+        .header-duzinho-btn:hover {
+            background-color: #c82333;
+            border-color: #bd2130;
+            color: white;
+        }
+
+        #new-book-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 20px;
+        }
+
+        nav a {
+            color: var(--light-color);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s;
+            padding: 5px 10px;
+            border-radius: 4px;
+        }
+
+        nav a:hover, nav a.active {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: var(--secondary-color);
+        }
+
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(rgba(139, 69, 19, 0.8), rgba(139, 69, 19, 0.9)), url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect width="100" height="100" fill="%238B4513"/><path d="M0 0L100 100M100 0L0 100" stroke="%23A0522D" stroke-width="1"/></svg>');
+            color: var(--light-color);
+            padding: 4rem 0;
+            text-align: center;
+        }
+
+        .hero h2 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            max-width: 700px;
+            margin: 0 auto 2rem;
+        }
+
+        .btn {
+            display: inline-block;
+            background-color: var(--secondary-color);
+            color: var(--text-color);
+            padding: 12px 24px;
+            border: none;
+            border-radius: var(--border-radius);
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+        }
+
+        .btn:hover:not(:disabled) {
+            background-color: var(--accent-color);
+            color: var(--light-color);
+            transform: translateY(-3px);
+            box-shadow: var(--shadow);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        /* About Sections */
+        .about-sections {
+            padding: 4rem 0;
+            background-color: white;
+        }
+
+        .about-container {
+            display: flex;
+            flex-direction: column;
+            gap: 3rem;
+        }
+
+        .about-section {
+            display: flex;
+            align-items: center;
+            gap: 3rem;
+            padding: 2rem;
+            background-color: var(--light-color);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+        }
+
+        .about-section.reverse {
+            flex-direction: row-reverse;
+        }
+
+        .about-image {
+            flex-shrink: 0;
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--secondary-color);
+            border: 5px solid var(--primary-color);
+        }
+
+        .about-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .duzinho-image {
+            border-radius: var(--border-radius);
+            width: 250px;
+            height: 200px;
+            border: 5px solid var(--primary-color);
+            overflow: hidden;
+        }
+
+        .duzinho-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .placeholder-icon {
+            font-size: 5rem;
+            color: var(--primary-color);
+        }
+
+        .about-content {
+            flex: 1;
+        }
+
+        .about-content h3 {
+            font-size: 2rem;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+            border-bottom: 2px solid var(--secondary-color);
+            padding-bottom: 0.5rem;
+        }
+
+        .about-content p {
+            margin-bottom: 1.5rem;
+            font-size: 1.1rem;
+        }
+
+        .duzinho-btn {
+            background-color: var(--red-color);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-size: 1.1rem;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: bold;
+        }
+
+        .duzinho-btn:hover {
+            background-color: #c82333;
+            transform: translateY(-3px);
+            box-shadow: var(--shadow);
+        }
+
+        /* Main Content */
+        .main-content {
+            padding: 3rem 0;
+        }
+
+        .steps {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            gap: 20px;
+            margin-bottom: 3rem;
+        }
+
+        .step {
+            flex: 1;
+            min-width: 250px;
+            background-color: white;
+            padding: 2rem;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            text-align: center;
+            transition: transform 0.3s;
+        }
+
+        .step:hover {
+            transform: translateY(-10px);
+        }
+
+        .step-icon {
+            font-size: 3rem;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+
+        .step h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        /* Book Creator */
+        .book-creator {
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            padding: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .creator-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        #save-book {
+            background-color: var(--primary-color);
+            color: white;
+            transition: all 0.3s;
+        }
+
+        #save-book.unsaved {
+            background-color: var(--red-color);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        /* Conteúdo Único - Tudo em uma aba só */
+        .book-creator-content {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 2rem;
+        }
+
+        .cover-options {
+            flex: 1;
+            min-width: 300px;
+            background-color: var(--light-color);
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.8rem;
+            border: 1px solid var(--secondary-color);
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+        }
+
+        .color-picker {
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            gap: 8px;
+            margin-top: 10px;
+            max-height: 200px;
+            overflow-y: auto;
+            padding: 10px;
+            border: 1px solid var(--secondary-color);
+            border-radius: var(--border-radius);
+        }
+
+        .color-option {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: transform 0.2s;
+        }
+
+        .color-option:hover {
+            transform: scale(1.1);
+        }
+
+        .color-option.active {
+            border-color: var(--dark-color);
+            transform: scale(1.1);
+        }
+
+        .size-options {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+            flex-wrap: wrap;
+        }
+
+        .size-btn {
+            padding: 8px 16px;
+            background-color: var(--secondary-color);
+            border: none;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .size-btn.active {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .size-btn:hover {
+            background-color: var(--accent-color);
+            color: white;
+        }
+
+        /* Page Editor */
+        .page-editor {
+            flex: 2;
+            min-width: 300px;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .page-toolbar {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            align-items: center;
+            background-color: var(--light-color);
+            padding: 1rem;
+            border-radius: var(--border-radius);
+        }
+
+        .tool-btn {
+            padding: 0.8rem 1.5rem;
+            background-color: var(--secondary-color);
+            border: none;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .tool-btn:hover {
+            background-color: var(--accent-color);
+            color: white;
+        }
+
+        .page-content {
+            min-height: 600px;
+            border: 1px solid var(--secondary-color);
+            border-radius: var(--border-radius);
+            padding: 2rem;
+            background-color: var(--light-color);
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.1);
+            overflow: auto;
+        }
+
+        .lined-page {
+            background-image: linear-gradient(to bottom, transparent 95%, #ccc 95%);
+            background-size: 100% 30px;
+            min-height: 500px;
+            padding: 1rem;
+            line-height: 30px;
+            outline: none;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .image-page {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 500px;
+            border: 2px dashed var(--secondary-color);
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .page-image {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+
+        .image-page i {
+            font-size: 3rem;
+            color: var(--secondary-color);
+            margin-bottom: 1rem;
+        }
+
+        .drawing-page {
+            min-height: 500px;
+            border: 2px solid var(--secondary-color);
+            border-radius: var(--border-radius);
+            position: relative;
+            cursor: crosshair;
+            background-color: white;
+        }
+
+        .drawing-canvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+            border-radius: var(--border-radius);
+        }
+
+        .introduction-page, .toc-page, .conclusion-page {
+            min-height: 500px;
+            padding: 2rem;
+            line-height: 1.8;
+            outline: none;
+        }
+
+        .introduction-page h2, .toc-page h2, .conclusion-page h2 {
+            text-align: center;
+            margin-bottom: 2rem;
+            color: var(--primary-color);
+            border-bottom: 2px solid var(--secondary-color);
+            padding-bottom: 1rem;
+        }
+
+        .toc-list {
+            list-style-type: none;
+            padding-left: 0;
+        }
+
+        .toc-list li {
+            padding: 0.5rem 0;
+            border-bottom: 1px dashed var(--secondary-color);
+        }
+
+        .toc-list li:last-child {
+            border-bottom: none;
+        }
+
+        /* Pages Navigation */
+        .pages-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .page-indicator {
+            font-weight: bold;
+        }
+
+        /* Books Gallery */
+        .books-gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 2rem;
+        }
+
+        .book-card {
+            background-color: white;
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+            cursor: pointer;
+            transition: transform 0.3s;
+            text-align: center;
+            position: relative;
+        }
+
+        .book-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .book-card-cover {
+            width: 100%;
+            height: 200px;
+            background-color: var(--secondary-color);
+            border-radius: var(--border-radius);
+            margin-bottom: 1rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .book-card-title {
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            font-size: 1.1rem;
+        }
+
+        /* Footer */
+        footer {
+            background-color: var(--primary-color);
+            color: var(--light-color);
+            padding: 2rem 0;
+            text-align: center;
+        }
+
+        .footer-content {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            gap: 2rem;
+        }
+
+        .footer-section {
+            flex: 1;
+            min-width: 250px;
+        }
+
+        .footer-section h3 {
+            margin-bottom: 1rem;
+            font-size: 1.3rem;
+        }
+
+        .footer-duzinho-btn {
+            display: inline-block;
+            background-color: var(--red-color);
+            color: white;
+            padding: 10px 20px;
+            border-radius: var(--border-radius);
+            text-decoration: none;
+            font-weight: bold;
+            margin-top: 1rem;
+            transition: all 0.3s;
+        }
+
+        .footer-duzinho-btn:hover {
+            background-color: #c82333;
+            transform: translateY(-3px);
+        }
+
+        .copyright {
+            margin-top: 2rem;
+            padding-top: 1rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Status indicators */
+        .status-indicator {
+            font-size: 0.8rem;
+            padding: 3px 8px;
+            border-radius: 12px;
+            margin-left: 10px;
+        }
+
+        .status-saved {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .status-unsaved {
+            background-color: var(--red-color);
+            color: white;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 992px) {
+            .about-section, .about-section.reverse {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .about-image, .duzinho-image {
+                margin: 0 auto;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            nav ul {
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 10px;
+            }
+
+            .hero h2 {
+                font-size: 2rem;
+            }
+
+            .steps {
+                flex-direction: column;
+            }
+
+            .book-creator-content {
+                flex-direction: column;
+            }
+
+            .color-picker {
+                grid-template-columns: repeat(6, 1fr);
+            }
+
+            .page-toolbar {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .footer-content {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .creator-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .color-picker {
+                grid-template-columns: repeat(4, 1fr);
+            }
+            
+            .pages-nav {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .size-options {
+                flex-direction: column;
+            }
+            
+            .about-image {
+                width: 150px;
+                height: 150px;
+            }
+            
+            .duzinho-image {
+                width: 200px;
+                height: 150px;
+            }
+            
+            .hero {
+                padding: 2rem 0;
+            }
+        }
+
+        /* Estilos para prévia da capa */
+        .cover-preview-page {
+            min-height: 500px;
+            padding: 2rem;
+            background-color: #f8f8f8;
+            border: 2px solid #8B4513;
+            border-radius: var(--border-radius);
+            text-align: center;
+            position: relative;
+        }
+
+        .cover-preview-front, .cover-preview-back {
+            background-color: var(--secondary-color);
+            padding: 2rem;
+            border-radius: var(--border-radius);
+            margin: 0 auto;
+            max-width: 400px;
+            min-height: 300px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cover-preview-title {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #3E2723;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        .cover-preview-author {
+            font-size: 1.2rem;
+            color: #5D4037;
+            text-align: center;
+        }
+
+        .cover-preview-image {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: 1;
+        }
+
+        .cover-preview-text {
+            position: relative;
+            z-index: 2;
+            background-color: rgba(255, 255, 255, 0.8);
+            padding: 1rem;
+            border-radius: 5px;
+            max-width: 90%;
+        }
+
+        /* Botão de excluir livro */
+        .delete-book-btn {
+            transition: all 0.3s;
+        }
+
+        .delete-book-btn:hover {
+            transform: scale(1.2);
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo" id="go-home">
+                    <i class="fas fa-book-open"></i>
+                    <h1>LivroArt</h1>
+                </div>
+                <div class="user-menu" id="user-menu">
+                    <span id="user-name"></span>
+                    <button id="new-book-btn">
+                        <i class="fas fa-plus"></i> Novo Livro
+                    </button>
+                    <button class="header-duzinho-btn" onclick="window.open('https://livrariaduzinho.netlify.app/', '_blank')">
+                        <i class="fas fa-store"></i> Livraria Duzinho
+                    </button>
+                    <button id="logout-btn">Sair</button>
+                </div>
+                <nav>
+                    <ul>
+                        <li><a href="#inicio" class="nav-link active" data-section="home">Início</a></li>
+                        <li><a href="#criar" class="nav-link" data-section="creator">Criar Livro</a></li>
+                        <li><a href="#meus-livros" class="nav-link" data-section="gallery">Meus Livros</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero" id="hero-section">
+        <div class="container">
+            <h2>Crie seu livro personalizado de forma fácil e criativa</h2>
+            <p>Com o LivroArt, você pode criar capas personalizadas, escrever páginas ilimitadas e baixar seu livro em PDF com alta qualidade.</p>
+            <a href="#criar" class="btn" id="start-creating">Comece Agora</a>
+        </div>
+    </section>
+
+    <!-- About Sections -->
+    <section class="about-sections" id="about-sections">
+        <div class="container about-container">
+            <!-- About Creator -->
+            <div class="about-section">
+                <div class="about-image" id="creator-image">
+                    <img src="du.png" alt="Eduardo Carvalho - Criador da LivroArt" id="creator-img">
+                    <div class="placeholder-icon" id="creator-placeholder" style="display: none;">
+                        <i class="fas fa-user-tie"></i>
+                    </div>
+                </div>
+                <div class="about-content">
+                    <h3>Eduardo Carvalho</h3>
+                    <p>Sou Eduardo Carvalho e sou o criador da LivroArt e Livraria Duzinho e juntas quero abrir portas para novos escritores e para que publiquem seus livros para o público! Quero expandir cada vez mais esses sites e poder fazer que aumente cada vez mais novas mentes brilhantes!</p>
+                </div>
+            </div>
+
+            <!-- Livraria Duzinho -->
+            <div class="about-section reverse">
+                <div class="about-image duzinho-image" id="livraria-image">
+                    <img src="livraria.png" alt="Livraria Duzinho" id="livraria-img">
+                    <div class="placeholder-icon" id="livraria-placeholder" style="display: none;">
+                        <i class="fas fa-store"></i>
+                    </div>
+                </div>
+                <div class="about-content">
+                    <h3>Livraria Duzinho</h3>
+                    <p>Está é uma livraria que eu criei com a intenção de qualquer pessoa que desejar colocar seu livro lá para o público ela possa! Então você pode criar seu livro, entrar em contato comigo e eu colocarei seu livro para o público!</p>
+                    <p><strong>Clique aqui abaixo para conhecer mais sobre a livraria:</strong></p>
+                    <button class="duzinho-btn" onclick="window.open('https://livrariaduzinho.netlify.app/', '_blank')">
+                        <i class="fas fa-external-link-alt"></i> Livraria Duzinho
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Content Container -->
+    <div class="container main-content">
+        <!-- Books Gallery -->
+        <section id="books-gallery-section" style="display: none;">
+            <h2>Meus Livros</h2>
+            <div class="books-gallery" id="books-gallery">
+                <!-- Books will be loaded here -->
+            </div>
+        </section>
+
+        <!-- Steps -->
+        <section class="steps" id="steps-section" style="display: none;">
+            <div class="step">
+                <div class="step-icon">
+                    <i class="fas fa-palette"></i>
+                </div>
+                <h3>Personalize a Capa</h3>
+                <p>Escolha entre 140+ cores, adicione título, autor e crie capas únicas para seu livro.</p>
+            </div>
+            <div class="step">
+                <div class="step-icon">
+                    <i class="fas fa-pencil-alt"></i>
+                </div>
+                <h3>Escreva seu Conteúdo</h3>
+                <p>Crie páginas com texto em linhas, adicione imagens ou use modelos prontos.</p>
+            </div>
+            <div class="step">
+                <div class="step-icon">
+                    <i class="fas fa-file-pdf"></i>
+                </div>
+                <h3>Baixe em PDF</h3>
+                <p>Após finalizar, baixe seu livro em PDF com alta qualidade, pronto para impressão.</p>
+            </div>
+        </section>
+
+        <!-- Book Creator -->
+        <section class="book-creator" id="criar" style="display: none;">
+            <div class="creator-header">
+                <h2>Criar Novo Livro <span id="save-status" class="status-indicator status-saved" style="display: none;">Salvo</span></h2>
+                <button class="btn" id="save-book">Salvar Livro</button>
+            </div>
+            
+            <div class="book-creator-content">
+                <!-- Opções da Capa -->
+                <div class="cover-options">
+                    <h3>Configurações da Capa</h3>
+                    
+                    <div class="form-group">
+                        <label for="book-title">Título do Livro *</label>
+                        <input type="text" id="book-title" class="form-control" placeholder="Digite o título do livro" value="Título do Livro" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="book-author">Autor *</label>
+                        <input type="text" id="book-author" class="form-control" placeholder="Digite o nome do autor" value="Autor" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Tamanho do Livro</label>
+                        <div class="size-options">
+                            <button class="size-btn active" data-size="a5">A5 (15x21cm)</button>
+                            <button class="size-btn" data-size="a6">A6 (10x15cm)</button>
+                            <button class="size-btn" data-size="pocket">Pocket (11x18cm)</button>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Cor da Capa</label>
+                        <div class="color-picker" id="color-picker">
+                            <!-- Cores serão adicionadas via JavaScript -->
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="cover-image">Imagem da Capa Frontal (opcional)</label>
+                        <input type="file" id="cover-image" class="form-control" accept="image/*">
+                        <small>Se não adicionar imagem, será usado apenas a cor de fundo.</small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="back-cover-image">Imagem da Capa Traseira (opcional)</label>
+                        <input type="file" id="back-cover-image" class="form-control" accept="image/*">
+                        <small>Imagem opcional para a capa traseira.</small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="back-cover-text">Texto da Capa Traseira (opcional)</label>
+                        <textarea id="back-cover-text" class="form-control" rows="4" placeholder="Digite o texto para a capa traseira (sinopse, biografia, etc.) Deixe em branco se não quiser texto."></textarea>
+                        <small>Deixe em branco se não quiser texto na capa traseira.</small>
+                    </div>
+                    
+                    <button class="btn" id="add-covers-to-book" style="width: 100%; margin-top: 1rem; background-color: var(--primary-color); color: white;">
+                        <i class="fas fa-plus"></i> Adicionar Capas ao Livro
+                    </button>
+                    <p style="margin-top: 0.5rem; font-size: 0.9rem; color: #666;">
+                        <small>As capas serão adicionadas como páginas visíveis no seu livro.</small>
+                    </p>
+                </div>
+
+                <!-- Editor de Páginas -->
+                <div class="page-editor">
+                    <div class="page-toolbar">
+                        <button class="tool-btn" id="add-lined-page">+ Página com Linhas</button>
+                        <button class="tool-btn" id="add-image-page">+ Página com Imagem</button>
+                        <button class="tool-btn" id="add-drawing-page">+ Página para Desenho</button>
+                        <button class="tool-btn" id="add-introduction">+ Introdução</button>
+                        <button class="tool-btn" id="add-toc">+ Sumário</button>
+                        <button class="tool-btn" id="add-conclusion">+ Conclusão</button>
+                        <button class="tool-btn" id="delete-page">Excluir Página</button>
+                    </div>
+                    
+                    <div class="page-content" id="page-content-container">
+                        <!-- Conteúdo será adicionado aqui -->
+                    </div>
+                    
+                    <div class="pages-nav">
+                        <button class="btn" id="prev-page">← Página Anterior</button>
+                        <div class="page-indicator">Página <span id="current-page">1</span> de <span id="total-pages">0</span></div>
+                        <button class="btn" id="next-page">Próxima Página →</button>
+                    </div>
+                    
+                    <div style="text-align: center; margin-top: 2rem;">
+                        <button class="btn" id="download-pdf" style="padding: 15px 30px; font-size: 1.2rem; background-color: var(--accent-color); color: white;">
+                            <i class="fas fa-download"></i> Baixar Livro em PDF
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Footer -->
+    <footer id="contato">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>LivroArt</h3>
+                    <p>Crie livros personalizados com facilidade e estilo. Sua história merece ser contada.</p>
+                </div>
+                <div class="footer-section">
+                    <h3>Contato</h3>
+                    <p>Email: livraria.duzinho@gmail.com</p>
+                    <p>Telefone: (43) 99861-7272</p>
+                    <a href="https://livrariaduzinho.netlify.app/" class="footer-duzinho-btn" target="_blank">
+                        <i class="fas fa-store"></i> Livraria Duzinho
+                    </a>
+                </div>
+            </div>
+            <div class="copyright">
+                <p>&copy; 2023 LivroArt. Todos os direitos reservados.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Sistema de Login e Sessão
+        const userMenu = document.getElementById('user-menu');
+        const userName = document.getElementById('user-name');
+        const booksGallerySection = document.getElementById('books-gallery-section');
+        const stepsSection = document.getElementById('steps-section');
+        const bookCreator = document.getElementById('criar');
+        const heroSection = document.getElementById('hero-section');
+        const aboutSections = document.getElementById('about-sections');
+        const startCreatingBtn = document.getElementById('start-creating');
+        const goHomeBtn = document.getElementById('go-home');
+        const saveStatus = document.getElementById('save-status');
+        const navLinks = document.querySelectorAll('.nav-link');
+
+        // Elementos das imagens
+        const creatorImg = document.getElementById('creator-img');
+        const creatorPlaceholder = document.getElementById('creator-placeholder');
+        const livrariaImg = document.getElementById('livraria-img');
+        const livrariaPlaceholder = document.getElementById('livraria-placeholder');
+
+        let currentUser = null;
+        let currentBook = {
+            id: Date.now(),
+            title: 'Título do Livro',
+            author: 'Autor',
+            coverColor: '#8B4513',
+            coverImage: null,
+            backCoverImage: null,
+            backCoverText: '',
+            coverSize: 'a5',
+            pages: [],
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+            hasCovers: false
+        };
+
+        // Sistema de desenho
+        let isDrawing = false;
+        let currentTool = 'brush';
+        let currentColor = '#000000';
+        let lastX = 0;
+        let lastY = 0;
+
+        // Variáveis de estado
+        let hasUnsavedChanges = false;
+        let isCreatingNewBook = false;
+
+        // Verificar imagens ao carregar a página
+        window.addEventListener('load', function() {
+            checkImageExists('du.png', creatorImg, creatorPlaceholder);
+            checkImageExists('livraria.png', livrariaImg, livrariaPlaceholder);
+        });
+
+        function checkImageExists(imagePath, imgElement, placeholderElement) {
+            const img = new Image();
+            img.onload = function() {
+                // Imagem existe, mostrar ela
+                imgElement.style.display = 'block';
+                if (placeholderElement) placeholderElement.style.display = 'none';
+            };
+            img.onerror = function() {
+                // Imagem não existe, mostrar placeholder
+                imgElement.style.display = 'none';
+                if (placeholderElement) placeholderElement.style.display = 'flex';
+            };
+            img.src = imagePath;
+        }
+
+        // Verificar se já existe um usuário logado
+        function checkLogin() {
+            const savedUser = localStorage.getItem('livroart_user');
+            if (savedUser) {
+                try {
+                    const userData = JSON.parse(savedUser);
+                    if (userData.isLoggedIn) {
+                        currentUser = userData;
+                        showUserMenu();
+                        setupUnsavedChangesTracking();
+                        updateBooksGallery();
+                        showHomePage();
+                        setupNavigation();
+                        return true;
+                    }
+                } catch (e) {
+                    console.error("Erro ao carregar usuário:", e);
+                }
+            }
+            
+            // Se não estiver logado, redirecionar para login
+            redirectToLogin();
+            return false;
+        }
+
+        function redirectToLogin() {
+            window.location.href = 'login.html';
+        }
+
+        function showUserMenu() {
+            userName.textContent = currentUser.username;
+        }
+
+        // Configurar navegação
+        function setupNavigation() {
+            navLinks.forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const section = link.getAttribute('data-section');
+                    
+                    // Atualizar navegação ativa
+                    navLinks.forEach(l => l.classList.remove('active'));
+                    link.classList.add('active');
+                    
+                    // Mostrar seção correspondente
+                    switch(section) {
+                        case 'home':
+                            showHomePage();
+                            break;
+                        case 'creator':
+                            showBookCreatorPage();
+                            break;
+                        case 'gallery':
+                            showBooksGallery();
+                            break;
+                    }
+                });
+            });
+        }
+
+        // Página Inicial
+        function showHomePage() {
+            heroSection.style.display = 'block';
+            aboutSections.style.display = 'block';
+            booksGallerySection.style.display = 'none';
+            stepsSection.style.display = 'none';
+            bookCreator.style.display = 'none';
+            
+            // Rolar para o topo
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Página Criar Livro
+        function showBookCreatorPage() {
+            heroSection.style.display = 'none';
+            aboutSections.style.display = 'none';
+            booksGallerySection.style.display = 'none';
+            stepsSection.style.display = 'none';
+            bookCreator.style.display = 'block';
+            
+            if (currentBook && currentBook.pages && currentBook.pages.length > 0 && hasUnsavedChanges) {
+                // Focar no botão salvar se houver alterações não salvas
+                setTimeout(() => {
+                    document.getElementById('save-book').scrollIntoView({ 
+                        behavior: 'smooth', 
+                        block: 'center' 
+                    });
+                }, 300);
+            }
+        }
+
+        // Página Meus Livros
+        function showBooksGallery() {
+            heroSection.style.display = 'none';
+            aboutSections.style.display = 'none';
+            booksGallerySection.style.display = 'block';
+            stepsSection.style.display = 'none';
+            bookCreator.style.display = 'none';
+            updateBooksGallery();
+        }
+
+        // Event Listeners
+        document.getElementById('logout-btn').addEventListener('click', () => {
+            // Atualizar estado de login para falso
+            const savedUser = localStorage.getItem('livroart_user');
+            if (savedUser) {
+                const userData = JSON.parse(savedUser);
+                userData.isLoggedIn = false;
+                localStorage.setItem('livroart_user', JSON.stringify(userData));
+            }
+            
+            // Redirecionar para login
+            redirectToLogin();
+        });
+
+        // Navegação antiga (para compatibilidade)
+        startCreatingBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            
+            if (currentBook && currentBook.pages && currentBook.pages.length > 0 && hasUnsavedChanges) {
+                alert('Você tem alterações não salvas no livro atual. Por favor, salve antes de começar um novo livro.');
+                document.getElementById('save-book').focus();
+            } else {
+                // Atualizar navegação
+                navLinks.forEach(l => l.classList.remove('active'));
+                document.querySelector('.nav-link[data-section="creator"]').classList.add('active');
+                
+                showBookCreatorPage();
+            }
+        });
+
+        goHomeBtn.addEventListener('click', () => {
+            navLinks.forEach(l => l.classList.remove('active'));
+            document.querySelector('.nav-link[data-section="home"]').classList.add('active');
+            showHomePage();
+        });
+
+        // Função para atualizar status de salvamento
+        function updateSaveStatus() {
+            if (hasUnsavedChanges) {
+                saveStatus.textContent = 'Não Salvo';
+                saveStatus.className = 'status-indicator status-unsaved';
+                saveStatus.style.display = 'inline-block';
+                document.getElementById('save-book').classList.add('unsaved');
+                document.getElementById('save-book').innerHTML = '<i class="fas fa-exclamation-circle"></i> Salvar Alterações';
+                
+                // Desabilitar botão Novo Livro
+                const newBookBtn = document.getElementById('new-book-btn');
+                newBookBtn.disabled = true;
+                newBookBtn.style.opacity = '0.5';
+                newBookBtn.style.cursor = 'not-allowed';
+                newBookBtn.innerHTML = '<i class="fas fa-lock"></i> Salve primeiro';
+            } else {
+                saveStatus.textContent = 'Salvo';
+                saveStatus.className = 'status-indicator status-saved';
+                saveStatus.style.display = 'inline-block';
+                document.getElementById('save-book').classList.remove('unsaved');
+                document.getElementById('save-book').innerHTML = 'Salvar Livro';
+                
+                // Habilitar botão Novo Livro
+                const newBookBtn = document.getElementById('new-book-btn');
+                newBookBtn.disabled = false;
+                newBookBtn.style.opacity = '1';
+                newBookBtn.style.cursor = 'pointer';
+                newBookBtn.innerHTML = '<i class="fas fa-plus"></i> Novo Livro';
+            }
+        }
+
+        // Função para marcar como não salvo
+        function markAsUnsaved() {
+            if (!hasUnsavedChanges) {
+                hasUnsavedChanges = true;
+                updateSaveStatus();
+            }
+        }
+
+        // Configurar rastreamento de alterações não salvas
+        function setupUnsavedChangesTracking() {
+            // Eventos nos campos da capa
+            bookTitleInput.addEventListener('input', () => {
+                currentBook.title = bookTitleInput.value || 'Título do Livro';
+                markAsUnsaved();
+            });
+
+            bookAuthorInput.addEventListener('input', () => {
+                currentBook.author = bookAuthorInput.value || 'Autor';
+                markAsUnsaved();
+            });
+
+            backCoverTextInput.addEventListener('input', () => {
+                currentBook.backCoverText = backCoverTextInput.value || '';
+                markAsUnsaved();
+            });
+
+            // Eventos de upload de imagem
+            coverImageInput.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(event) {
+                        currentBook.coverImage = event.target.result;
+                        markAsUnsaved();
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+
+            backCoverImageInput.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(event) {
+                        currentBook.backCoverImage = event.target.result;
+                        markAsUnsaved();
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+
+            // Eventos de cores e tamanhos
+            document.querySelectorAll('.color-option').forEach(option => {
+                option.addEventListener('click', () => {
+                    markAsUnsaved();
+                });
+            });
+
+            document.querySelectorAll('.size-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    markAsUnsaved();
+                });
+            });
+
+            // Eventos de páginas
+            const pageEvents = [
+                'add-lined-page',
+                'add-image-page',
+                'add-drawing-page',
+                'add-introduction',
+                'add-toc',
+                'add-conclusion',
+                'add-covers-to-book',
+                'delete-page'
+            ];
+
+            pageEvents.forEach(id => {
+                document.getElementById(id).addEventListener('click', markAsUnsaved);
+            });
+
+            // Eventos de navegação entre páginas (salvam conteúdo)
+            document.getElementById('prev-page').addEventListener('click', () => {
+                saveCurrentPageContent();
+                markAsUnsaved();
+            });
+
+            document.getElementById('next-page').addEventListener('click', () => {
+                saveCurrentPageContent();
+                markAsUnsaved();
+            });
+        }
+
+        // Evento do botão Novo Livro
+        document.getElementById('new-book-btn').addEventListener('click', () => {
+            if (!hasUnsavedChanges) {
+                if (confirm('Deseja criar um novo livro? O livro atual foi salvo.')) {
+                    initNewBook();
+                    
+                    // Atualizar navegação
+                    navLinks.forEach(l => l.classList.remove('active'));
+                    document.querySelector('.nav-link[data-section="creator"]').classList.add('active');
+                    
+                    showBookCreatorPage();
+                }
+            } else {
+                alert('Por favor, salve o livro atual antes de criar um novo!');
+                document.getElementById('save-book').focus();
+            }
+        });
+
+        // Sistema de cores CSS
+        const cssColors = [
+            {name: "SaddleBrown", hex: "#8B4513"},
+            {name: "Brown", hex: "#A52A2A"},
+            {name: "Maroon", hex: "#800000"},
+            {name: "DarkRed", hex: "#8B0000"},
+            {name: "FireBrick", hex: "#B22222"},
+            {name: "Crimson", hex: "#DC143C"},
+            {name: "IndianRed", hex: "#CD5C5C"},
+            {name: "Salmon", hex: "#FA8072"},
+            {name: "DarkSalmon", hex: "#E9967A"},
+            {name: "Coral", hex: "#FF7F50"},
+            {name: "Tomato", hex: "#FF6347"},
+            {name: "OrangeRed", hex: "#FF4500"},
+            {name: "DarkOrange", hex: "#FF8C00"},
+            {name: "Orange", hex: "#FFA500"},
+            {name: "Gold", hex: "#FFD700"},
+            {name: "Yellow", hex: "#FFFF00"},
+            {name: "LightYellow", hex: "#FFFFE0"},
+            {name: "LemonChiffon", hex: "#FFFACD"},
+            {name: "LightGoldenRodYellow", hex: "#FAFAD2"},
+            {name: "PapayaWhip", hex: "#FFEFD5"},
+            {name: "Moccasin", hex: "#FFE4B5"},
+            {name: "PeachPuff", hex: "#FFDAB9"},
+            {name: "PaleGoldenRod", hex: "#EEE8AA"},
+            {name: "Khaki", hex: "#F0E68C"},
+            {name: "DarkKhaki", hex: "#BDB76B"},
+            {name: "GreenYellow", hex: "#ADFF2F"},
+            {name: "Chartreuse", hex: "#7FFF00"},
+            {name: "LawnGreen", hex: "#7CFC00"},
+            {name: "Lime", hex: "#00FF00"},
+            {name: "LimeGreen", hex: "#32CD32"},
+            {name: "ForestGreen", hex: "#228B22"},
+            {name: "Green", hex: "#008000"},
+            {name: "DarkGreen", hex: "#006400"},
+            {name: "SeaGreen", hex: "#2E8B57"},
+            {name: "MediumSeaGreen", hex: "#3CB371"},
+            {name: "LightSeaGreen", hex: "#20B2AA"},
+            {name: "DarkCyan", hex: "#008B8B"},
+            {name: "Teal", hex: "#008080"},
+            {name: "Aqua", hex: "#00FFFF"},
+            {name: "Cyan", hex: "#00FFFF"},
+            {name: "LightCyan", hex: "#E0FFFF"},
+            {name: "PaleTurquoise", hex: "#AFEEEE"},
+            {name: "Turquoise", hex: "#40E0D0"},
+            {name: "MediumTurquoise", hex: "#48D1CC"},
+            {name: "DarkTurquoise", hex: "#00CED1"},
+            {name: "CadetBlue", hex: "#5F9EA0"},
+            {name: "SteelBlue", hex: "#4682B4"},
+            {name: "LightSteelBlue", hex: "#B0C4DE"},
+            {name: "PowderBlue", hex: "#B0E0E6"},
+            {name: "LightBlue", hex: "#ADD8E6"},
+            {name: "SkyBlue", hex: "#87CEEB"},
+            {name: "LightSkyBlue", hex: "#87CEFA"},
+            {name: "DeepSkyBlue", hex: "#00BFFF"},
+            {name: "DodgerBlue", hex: "#1E90FF"},
+            {name: "CornflowerBlue", hex: "#6495ED"},
+            {name: "RoyalBlue", hex: "#4169E1"},
+            {name: "Blue", hex: "#0000FF"},
+            {name: "MediumBlue", hex: "#0000CD"},
+            {name: "DarkBlue", hex: "#00008B"},
+            {name: "Navy", hex: "#000080"},
+            {name: "MidnightBlue", hex: "#191970"},
+            {name: "Indigo", hex: "#4B0082"},
+            {name: "Purple", hex: "#800080"},
+            {name: "DarkMagenta", hex: "#8B008B"},
+            {name: "DarkViolet", hex: "#9400D3"},
+            {name: "BlueViolet", hex: "#8A2BE2"},
+            {name: "MediumPurple", hex: "#9370DB"},
+            {name: "MediumSlateBlue", hex: "#7B68EE"},
+            {name: "SlateBlue", hex: "#6A5ACD"},
+            {name: "DarkSlateBlue", hex: "#483D8B"},
+            {name: "RebeccaPurple", hex: "#663399"},
+            {name: "MediumOrchid", hex: "#BA55D3"},
+            {name: "DarkOrchid", hex: "#9932CC"},
+            {name: "Orchid", hex: "#DA70D6"},
+            {name: "Violet", hex: "#EE82EE"},
+            {name: "Plum", hex: "#DDA0DD"},
+            {name: "Thistle", hex: "#D8BFD8"},
+            {name: "Lavender", hex: "#E6E6FA"},
+            {name: "White", hex: "#FFFFFF"},
+            {name: "Snow", hex: "#FFFAFA"},
+            {name: "HoneyDew", hex: "#F0FFF0"},
+            {name: "MintCream", hex: "#F5FFFA"},
+            {name: "Azure", hex: "#F0FFFF"},
+            {name: "AliceBlue", hex: "#F0F8FF"},
+            {name: "GhostWhite", hex: "#F8F8FF"},
+            {name: "WhiteSmoke", hex: "#F5F5F5"},
+            {name: "SeaShell", hex: "#FFF5EE"},
+            {name: "Beige", hex: "#F5F5DC"},
+            {name: "OldLace", hex: "#FDF5E6"},
+            {name: "FloralWhite", hex: "#FFFAF0"},
+            {name: "Ivory", hex: "#FFFFF0"},
+            {name: "AntiqueWhite", hex: "#FAEBD7"},
+            {name: "Linen", hex: "#FAF0E6"},
+            {name: "LavenderBlush", hex: "#FFF0F5"},
+            {name: "MistyRose", hex: "#FFE4E1"},
+            {name: "Gainsboro", hex: "#DCDCDC"},
+            {name: "LightGray", hex: "#D3D3D3"},
+            {name: "Silver", hex: "#C0C0C0"},
+            {name: "DarkGray", hex: "#A9A9A9"},
+            {name: "Gray", hex: "#808080"},
+            {name: "DimGray", hex: "#696969"},
+            {name: "LightSlateGray", hex: "#778899"},
+            {name: "SlateGray", hex: "#708090"},
+            {name: "DarkSlateGray", hex: "#2F4F4F"},
+            {name: "Black", hex: "#000000"}
+        ];
+
+        // Inicializar paleta de cores
+        function initColorPicker() {
+            const colorPicker = document.getElementById('color-picker');
+            colorPicker.innerHTML = '';
+            
+            cssColors.forEach(color => {
+                const colorOption = document.createElement('div');
+                colorOption.className = 'color-option';
+                colorOption.style.backgroundColor = color.hex;
+                colorOption.setAttribute('data-color', color.hex);
+                colorOption.setAttribute('title', `${color.name} (${color.hex})`);
+                
+                // Selecionar a cor padrão inicial
+                if (color.hex === '#8B4513') {
+                    colorOption.classList.add('active');
+                }
+                
+                colorOption.addEventListener('click', () => {
+                    document.querySelectorAll('.color-option').forEach(o => o.classList.remove('active'));
+                    colorOption.classList.add('active');
+                    currentBook.coverColor = color.hex;
+                });
+                
+                colorPicker.appendChild(colorOption);
+            });
+        }
+
+        // Tamanhos de capa
+        function initSizeOptions() {
+            const sizeButtons = document.querySelectorAll('.size-btn');
+            
+            sizeButtons.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    sizeButtons.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    currentBook.coverSize = btn.getAttribute('data-size');
+                });
+            });
+        }
+
+        // Cover Customization
+        const bookTitleInput = document.getElementById('book-title');
+        const bookAuthorInput = document.getElementById('book-author');
+        const coverImageInput = document.getElementById('cover-image');
+        const backCoverImageInput = document.getElementById('back-cover-image');
+        const backCoverTextInput = document.getElementById('back-cover-text');
+
+        // Page Management
+        let currentPageIndex = 0;
+        const currentPageElement = document.getElementById('current-page');
+        const totalPagesElement = document.getElementById('total-pages');
+        const pageContentContainer = document.getElementById('page-content-container');
+
+        function initNewBook() {
+            currentBook = {
+                id: Date.now(),
+                title: 'Título do Livro',
+                author: 'Autor',
+                coverColor: '#8B4513',
+                coverImage: null,
+                backCoverImage: null,
+                backCoverText: '',
+                coverSize: 'a5',
+                pages: [],
+                createdAt: new Date().toISOString(),
+                updatedAt: new Date().toISOString(),
+                hasCovers: false
+            };
+            
+            // Reset UI
+            bookTitleInput.value = currentBook.title;
+            bookAuthorInput.value = currentBook.author;
+            backCoverTextInput.value = currentBook.backCoverText;
+            coverImageInput.value = '';
+            backCoverImageInput.value = '';
+            
+            // Resetar cores
+            initColorPicker();
+            
+            // Limpar páginas
+            currentBook.pages = [];
+            currentPageIndex = 0;
+            updatePageDisplay();
+            
+            // Adicionar página inicial
+            addPage('lined', '<div class="lined-page" contenteditable="true">Comece a escrever seu livro aqui...</div>');
+            
+            // Resetar estado de salvamento
+            hasUnsavedChanges = false;
+            updateSaveStatus();
+        }
+
+        // Função para adicionar capas como páginas visíveis
+        function addCoversAsPages() {
+            // Verificar se título e autor foram preenchidos
+            if (!currentBook.title.trim() || currentBook.title === 'Título do Livro') {
+                alert('Por favor, preencha o título do livro antes de adicionar as capas.');
+                bookTitleInput.focus();
+                return;
+            }
+            
+            if (!currentBook.author.trim() || currentBook.author === 'Autor') {
+                alert('Por favor, preencha o nome do autor antes de adicionar as capas.');
+                bookAuthorInput.focus();
+                return;
+            }
+            
+            // Remover capas antigas se já existirem
+            if (currentBook.hasCovers) {
+                // Remover primeira e última página (as capas)
+                if (currentBook.pages.length > 0 && currentBook.pages[0].type === 'cover-front') {
+                    currentBook.pages.shift(); // Remove capa frontal
+                }
+                if (currentBook.pages.length > 0 && currentBook.pages[currentBook.pages.length - 1].type === 'cover-back') {
+                    currentBook.pages.pop(); // Remove capa traseira
+                }
+            }
+            
+            // Adicionar capa frontal como PRIMEIRA página
+            const frontCoverContent = `
+                <div class="cover-preview-page">
+                    <h3 style="color: var(--primary-color); margin-bottom: 1.5rem;">PRÉVIA - CAPA FRONTAL</h3>
+                    <div class="cover-preview-front" style="background-color: ${currentBook.coverColor};">
+                        ${currentBook.coverImage ? `<img src="${currentBook.coverImage}" class="cover-preview-image" alt="Capa">` : ''}
+                        <div class="cover-preview-text">
+                            <div class="cover-preview-title">${currentBook.title}</div>
+                            <div class="cover-preview-author">${currentBook.author}</div>
+                        </div>
+                    </div>
+                    <p style="margin-top: 1.5rem; color: #666; font-style: italic;">
+                        Esta página mostra como ficará a capa frontal do seu livro.<br>
+                        No PDF final, esta será a primeira página.
+                    </p>
+                </div>
+            `;
+            
+            currentBook.pages.unshift({
+                type: 'cover-front',
+                content: frontCoverContent,
+                id: Date.now() + '-front',
+                isCover: true
+            });
+            
+            // Adicionar capa traseira como ÚLTIMA página
+            const backCoverContent = `
+                <div class="cover-preview-page">
+                    <h3 style="color: var(--primary-color); margin-bottom: 1.5rem;">PRÉVIA - CAPA TRASEIRA</h3>
+                    <div class="cover-preview-back" style="background-color: ${currentBook.coverColor};">
+                        ${currentBook.backCoverImage ? `<img src="${currentBook.backCoverImage}" class="cover-preview-image" alt="Capa Traseira">` : ''}
+                        ${currentBook.backCoverText ? `
+                            <div class="cover-preview-text">
+                                ${currentBook.backCoverText.replace(/\n/g, '<br>')}
+                            </div>
+                        ` : `
+                            <div class="cover-preview-text">
+                                <em>Capa traseira sem texto adicional.</em>
+                            </div>
+                        `}
+                    </div>
+                    <p style="margin-top: 1.5rem; color: #666; font-style: italic;">
+                        Esta página mostra como ficará a capa traseira do seu livro.<br>
+                        No PDF final, esta será a última página.
+                    </p>
+                </div>
+            `;
+            
+            currentBook.pages.push({
+                type: 'cover-back',
+                content: backCoverContent,
+                id: Date.now() + '-back',
+                isCover: true
+            });
+            
+            currentBook.hasCovers = true;
+            currentPageIndex = 0; // Voltar para a primeira página (capa frontal)
+            updatePageDisplay();
+            
+            alert('Capas adicionadas ao livro!\n• Capa frontal: Primeira página\n• Capa traseira: Última página\n\nVocê pode navegar entre as páginas usando os botões "←" e "→".');
+        }
+
+        function addPage(type, content = null) {
+            const pageId = Date.now() + Math.random();
+            let pageContent = '';
+            
+            // Se conteúdo for fornecido, usar ele
+            if (content) {
+                pageContent = content;
+            } else {
+                // Criar conteúdo padrão baseado no tipo
+                switch(type) {
+                    case 'lined':
+                        pageContent = '<div class="lined-page" contenteditable="true">Comece a escrever aqui...</div>';
+                        break;
+                    case 'image':
+                        pageContent = '<div class="image-page"><i class="fas fa-image"></i><p>Clique para adicionar uma imagem</p></div>';
+                        break;
+                    case 'drawing':
+                        pageContent = createDrawingPageHTML();
+                        break;
+                    case 'introduction':
+                        pageContent = `<div class="introduction-page" contenteditable="true">
+                            <h2>Introdução</h2>
+                            <p>Comece a escrever sua introdução aqui...</p>
+                        </div>`;
+                        break;
+                    case 'toc':
+                        pageContent = `<div class="toc-page" contenteditable="true">
+                            <h2>Sumário</h2>
+                            <ul class="toc-list">
+                                <li>Capítulo 1: [Título] ................. 1</li>
+                                <li>Capítulo 2: [Título] ................. 5</li>
+                                <li>Capítulo 3: [Título] ................. 10</li>
+                            </ul>
+                        </div>`;
+                        break;
+                    case 'conclusion':
+                        pageContent = `<div class="conclusion-page" contenteditable="true">
+                            <h2>Conclusão</h2>
+                            <p>Escreva sua conclusão aqui...</p>
+                        </div>`;
+                        break;
+                }
+            }
+            
+            // Criar objeto da página
+            const newPage = {
+                type: type,
+                content: pageContent,
+                id: pageId,
+                imageData: null,
+                canvasData: null
+            };
+            
+            // Se já tem capas, adicionar antes da capa traseira
+            if (currentBook.hasCovers && currentBook.pages.length > 0) {
+                const lastPageIndex = currentBook.pages.length - 1;
+                currentBook.pages.splice(lastPageIndex, 0, newPage);
+                currentPageIndex = lastPageIndex; // Posicionar na nova página
+            } else {
+                currentBook.pages.push(newPage);
+                currentPageIndex = currentBook.pages.length - 1;
+            }
+            
+            updatePageDisplay();
+            currentBook.updatedAt = new Date().toISOString();
+        }
+
+        function createDrawingPageHTML() {
+            return `
+                <div class="drawing-page">
+                    <div style="position: absolute; top: 10px; left: 10px; display: flex; gap: 5px; background-color: rgba(255, 255, 255, 0.9); padding: 5px; border-radius: 5px;">
+                        <button class="tool-btn" data-tool="brush" style="padding: 5px 10px; font-size: 0.9rem;">Pincel</button>
+                        <button class="tool-btn" data-tool="eraser" style="padding: 5px 10px; font-size: 0.9rem;">Borracha</button>
+                        <input type="color" value="#000000" style="width: 40px; height: 30px;">
+                        <button class="tool-btn" id="clear-drawing" style="padding: 5px 10px; font-size: 0.9rem;">Limpar</button>
+                    </div>
+                    <canvas class="drawing-canvas" width="800" height="500" style="width: 100%; height: 100%;"></canvas>
+                </div>
+            `;
+        }
+
+        function initDrawingPage() {
+            const drawingPage = pageContentContainer.querySelector('.drawing-page');
+            if (!drawingPage) return;
+            
+            const canvas = drawingPage.querySelector('.drawing-canvas');
+            const ctx = canvas.getContext('2d');
+            const tools = drawingPage.querySelectorAll('.tool-btn[data-tool]');
+            const colorPicker = drawingPage.querySelector('input[type="color"]');
+            const clearBtn = drawingPage.querySelector('#clear-drawing');
+            
+            // Ajustar tamanho do canvas
+            canvas.width = canvas.offsetWidth;
+            canvas.height = canvas.offsetHeight;
+            
+            // Configurar contexto
+            ctx.lineWidth = 2;
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+            
+            // Eventos de ferramentas
+            tools.forEach(tool => {
+                tool.addEventListener('click', () => {
+                    tools.forEach(t => t.style.backgroundColor = '');
+                    tool.style.backgroundColor = '#A0522D';
+                    tool.style.color = 'white';
+                    currentTool = tool.getAttribute('data-tool');
+                });
+            });
+            
+            // Evento de cor
+            colorPicker.addEventListener('input', (e) => {
+                currentColor = e.target.value;
+            });
+            
+            // Evento de limpar
+            clearBtn.addEventListener('click', () => {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                saveDrawingState();
+            });
+            
+            // Eventos de desenho
+            canvas.addEventListener('mousedown', startDrawing);
+            canvas.addEventListener('mousemove', draw);
+            canvas.addEventListener('mouseup', stopDrawing);
+            canvas.addEventListener('mouseout', stopDrawing);
+            
+            function startDrawing(e) {
+                isDrawing = true;
+                lastX = e.offsetX;
+                lastY = e.offsetY;
+            }
+            
+            function draw(e) {
+                if (!isDrawing) return;
+                
+                ctx.beginPath();
+                ctx.moveTo(lastX, lastY);
+                ctx.lineTo(e.offsetX, e.offsetY);
+                
+                if (currentTool === 'brush') {
+                    ctx.strokeStyle = currentColor;
+                    ctx.stroke();
+                } else if (currentTool === 'eraser') {
+                    ctx.strokeStyle = '#ffffff';
+                    ctx.lineWidth = 10;
+                    ctx.stroke();
+                    ctx.lineWidth = 2;
+                }
+                
+                lastX = e.offsetX;
+                lastY = e.offsetY;
+                
+                saveDrawingState();
+            }
+            
+            function stopDrawing() {
+                isDrawing = false;
+            }
+            
+            function saveDrawingState() {
+                // Salvar estado do desenho
+                const page = currentBook.pages[currentPageIndex];
+                if (page.type === 'drawing') {
+                    page.canvasData = canvas.toDataURL();
+                    currentBook.updatedAt = new Date().toISOString();
+                }
+            }
+        }
+
+        function deleteCurrentPage() {
+            if (currentBook.pages.length > 0) {
+                const pageToDelete = currentBook.pages[currentPageIndex];
+                
+                // Não permitir excluir capas
+                if (pageToDelete.isCover) {
+                    alert('Esta é uma página de capa. Para removê-la, adicione novas capas usando o botão "Adicionar Capas ao Livro".');
+                    return;
+                }
+                
+                currentBook.pages.splice(currentPageIndex, 1);
+                if (currentPageIndex >= currentBook.pages.length) {
+                    currentPageIndex = Math.max(0, currentBook.pages.length - 1);
+                }
+                updatePageDisplay();
+                currentBook.updatedAt = new Date().toISOString();
+            }
+        }
+
+        function updatePageDisplay() {
+            if (currentBook.pages.length === 0) {
+                pageContentContainer.innerHTML = '<div style="text-align: center; padding: 3rem; color: #666;"><p>Nenhuma página adicionada ainda.</p><p>Use os botões acima para adicionar páginas ao seu livro.</p></div>';
+                currentPageElement.textContent = '0';
+                totalPagesElement.textContent = '0';
+                return;
+            }
+            
+            const page = currentBook.pages[currentPageIndex];
+            pageContentContainer.innerHTML = page.content;
+            
+            // Se for uma página de imagem, adicionar evento de clique
+            if (page.type === 'image') {
+                const imagePage = pageContentContainer.querySelector('.image-page');
+                if (imagePage && !imagePage.querySelector('input')) {
+                    imagePage.addEventListener('click', () => {
+                        const input = document.createElement('input');
+                        input.type = 'file';
+                        input.accept = 'image/*';
+                        input.style.display = 'none';
+                        input.addEventListener('change', (e) => {
+                            const file = e.target.files[0];
+                            if (file) {
+                                const reader = new FileReader();
+                                reader.onload = function(event) {
+                                    imagePage.innerHTML = '';
+                                    const img = document.createElement('img');
+                                    img.src = event.target.result;
+                                    img.className = 'page-image';
+                                    imagePage.appendChild(img);
+                                    
+                                    // Salvar a imagem no livro
+                                    page.imageData = event.target.result;
+                                    currentBook.updatedAt = new Date().toISOString();
+                                };
+                                reader.readAsDataURL(file);
+                            }
+                        });
+                        document.body.appendChild(input);
+                        input.click();
+                        document.body.removeChild(input);
+                    });
+                }
+            }
+            
+            // Se for uma página de desenho, inicializar
+            if (page.type === 'drawing') {
+                setTimeout(() => initDrawingPage(), 100);
+            }
+            
+            // Adicionar eventos para salvar conteúdo editável
+            pageContentContainer.querySelectorAll('[contenteditable="true"]').forEach(element => {
+                element.addEventListener('input', () => {
+                    page.content = pageContentContainer.innerHTML;
+                    currentBook.updatedAt = new Date().toISOString();
+                });
+            });
+            
+            currentPageElement.textContent = currentPageIndex + 1;
+            totalPagesElement.textContent = currentBook.pages.length;
+        }
+
+        // Função para salvar o conteúdo da página atual antes de navegar
+        function saveCurrentPageContent() {
+            if (currentBook.pages.length > 0 && currentPageIndex < currentBook.pages.length) {
+                const page = currentBook.pages[currentPageIndex];
+                
+                // Para páginas editáveis
+                if (page.type === 'lined' || page.type === 'introduction' || page.type === 'toc' || page.type === 'conclusion') {
+                    const editableContent = pageContentContainer.querySelector('[contenteditable="true"]');
+                    if (editableContent) {
+                        page.content = pageContentContainer.innerHTML;
+                    }
+                }
+                
+                // Para páginas de imagem
+                if (page.type === 'image') {
+                    const img = pageContentContainer.querySelector('img');
+                    if (img && img.src) {
+                        page.imageData = img.src;
+                    }
+                }
+                
+                // Para páginas de desenho
+                if (page.type === 'drawing') {
+                    const canvas = pageContentContainer.querySelector('canvas');
+                    if (canvas) {
+                        page.canvasData = canvas.toDataURL();
+                    }
+                }
+                
+                currentBook.updatedAt = new Date().toISOString();
+            }
+        }
+
+        // Event Listeners para páginas
+        document.getElementById('add-lined-page').addEventListener('click', () => addPage('lined'));
+        document.getElementById('add-image-page').addEventListener('click', () => addPage('image'));
+        document.getElementById('add-drawing-page').addEventListener('click', () => addPage('drawing'));
+        document.getElementById('add-introduction').addEventListener('click', () => addPage('introduction'));
+        document.getElementById('add-toc').addEventListener('click', () => addPage('toc'));
+        document.getElementById('add-conclusion').addEventListener('click', () => addPage('conclusion'));
+        document.getElementById('add-covers-to-book').addEventListener('click', addCoversAsPages);
+        document.getElementById('delete-page').addEventListener('click', deleteCurrentPage);
+
+        document.getElementById('prev-page').addEventListener('click', () => {
+            saveCurrentPageContent();
+            if (currentPageIndex > 0) {
+                currentPageIndex--;
+                updatePageDisplay();
+            }
+        });
+
+        document.getElementById('next-page').addEventListener('click', () => {
+            saveCurrentPageContent();
+            if (currentBook.pages.length > 0 && currentPageIndex < currentBook.pages.length - 1) {
+                currentPageIndex++;
+                updatePageDisplay();
+            }
+        });
+
+        // Salvar livro
+        document.getElementById('save-book').addEventListener('click', () => {
+            if (!currentUser) {
+                redirectToLogin();
+                return;
+            }
+            
+            // Validar título e autor
+            if (!currentBook.title.trim() || currentBook.title === 'Título do Livro') {
+                alert('Por favor, preencha o título do livro antes de salvar.');
+                bookTitleInput.focus();
+                return;
+            }
+            
+            if (!currentBook.author.trim() || currentBook.author === 'Autor') {
+                alert('Por favor, preencha o nome do autor antes de salvar.');
+                bookAuthorInput.focus();
+                return;
+            }
+            
+            // IMPORTANTE: Salvar o conteúdo atual da página antes de salvar
+            saveCurrentPageContent();
+            
+            // Atualizar dados do livro
+            currentBook.updatedAt = new Date().toISOString();
+            
+            // Salvar no localStorage
+            let userBooks = JSON.parse(localStorage.getItem(`livroart_books_${currentUser.id}`)) || [];
+            
+            // Verificar se já existe (atualizar) ou adicionar novo
+            const existingIndex = userBooks.findIndex(book => book.id === currentBook.id);
+            if (existingIndex >= 0) {
+                userBooks[existingIndex] = JSON.parse(JSON.stringify(currentBook));
+            } else {
+                userBooks.push(JSON.parse(JSON.stringify(currentBook)));
+            }
+            
+            localStorage.setItem(`livroart_books_${currentUser.id}`, JSON.stringify(userBooks));
+            
+            // Atualizar a galeria
+            updateBooksGallery();
+            
+            // Marcar como salvo
+            hasUnsavedChanges = false;
+            updateSaveStatus();
+            
+            alert('Livro salvo com sucesso! Agora você pode criar um novo livro se desejar.');
+        });
+
+        // Função para atualizar a galeria de livros
+        function updateBooksGallery() {
+            if (!currentUser) return;
+            
+            const booksGallery = document.getElementById('books-gallery');
+            booksGallery.innerHTML = '';
+            
+            const userBooks = JSON.parse(localStorage.getItem(`livroart_books_${currentUser.id}`)) || [];
+            
+            if (userBooks.length === 0) {
+                booksGallery.innerHTML = '<div style="text-align: center; padding: 2rem; color: #666; grid-column: 1 / -1;"><p>Você ainda não criou nenhum livro.</p><p>Clique em "Criar Livro" para começar!</p></div>';
+                return;
+            }
+            
+            userBooks.forEach((book, index) => {
+                const bookCard = document.createElement('div');
+                bookCard.className = 'book-card';
+                bookCard.innerHTML = `
+                    <div class="book-card-cover" style="background-color: ${book.coverColor};">
+                        ${book.coverImage ? `<img src="${book.coverImage}" style="width: 100%; height: 100%; object-fit: cover;">` : 
+                          `<div style="display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100%; color: white; padding: 1rem; text-align: center;">
+                            <h3 style="margin-bottom: 0.5rem; font-size: 1.2rem;">${book.title}</h3>
+                            <p style="font-size: 0.9rem;">${book.author}</p>
+                           </div>`}
+                    </div>
+                    <div class="book-card-title">${book.title}</div>
+                    <div class="book-card-author" style="color: #666; margin-bottom: 0.5rem;">${book.author}</div>
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <small style="color: #888;">${new Date(book.updatedAt).toLocaleDateString('pt-BR')}</small>
+                        <button class="delete-book-btn" data-index="${index}" style="background: none; border: none; color: #dc3545; cursor: pointer; font-size: 1.2rem;" title="Excluir livro">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                    <div style="margin-top: 0.5rem; font-size: 0.8rem; color: #888;">
+                        ${book.pages ? `${book.pages.length} páginas` : '0 páginas'}
+                    </div>
+                `;
+                
+                // Evento para carregar o livro
+                bookCard.addEventListener('click', (e) => {
+                    if (!e.target.closest('.delete-book-btn')) {
+                        loadBook(book);
+                        
+                        // Atualizar navegação
+                        navLinks.forEach(l => l.classList.remove('active'));
+                        document.querySelector('.nav-link[data-section="creator"]').classList.add('active');
+                        
+                        showBookCreatorPage();
+                    }
+                });
+                
+                // Evento para excluir o livro
+                const deleteBtn = bookCard.querySelector('.delete-book-btn');
+                deleteBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    if (confirm(`Tem certeza que deseja excluir o livro "${book.title}"? Esta ação não pode ser desfeita.`)) {
+                        deleteBook(index);
+                    }
+                });
+                
+                booksGallery.appendChild(bookCard);
+            });
+        }
+
+        // Função para excluir um livro
+        function deleteBook(index) {
+            if (!currentUser) return;
+            
+            let userBooks = JSON.parse(localStorage.getItem(`livroart_books_${currentUser.id}`)) || [];
+            
+            if (index >= 0 && index < userBooks.length) {
+                const bookToDelete = userBooks[index];
+                userBooks.splice(index, 1);
+                localStorage.setItem(`livroart_books_${currentUser.id}`, JSON.stringify(userBooks));
+                
+                // Atualizar a galeria
+                updateBooksGallery();
+                
+                // Se estiver visualizando o livro que foi excluído, criar um novo
+                if (currentBook.id === bookToDelete.id) {
+                    initNewBook();
+                }
+                
+                alert('Livro excluído com sucesso!');
+            }
+        }
+
+        function loadBook(book) {
+            currentBook = JSON.parse(JSON.stringify(book)); // Deep clone
+            isCreatingNewBook = false;
+            hasUnsavedChanges = false;
+            
+            // Atualizar status de salvamento
+            updateSaveStatus();
+            
+            // Atualizar UI
+            bookTitleInput.value = currentBook.title;
+            bookAuthorInput.value = currentBook.author;
+            backCoverTextInput.value = currentBook.backCoverText || '';
+            
+            // Atualizar cores
+            document.querySelectorAll('.color-option').forEach(o => o.classList.remove('active'));
+            document.querySelector(`.color-option[data-color="${currentBook.coverColor}"]`)?.classList.add('active');
+            
+            // Atualizar tamanho
+            document.querySelectorAll('.size-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.getAttribute('data-size') === currentBook.coverSize) {
+                    btn.classList.add('active');
+                }
+            });
+            
+            // Restaurar capas se existirem
+            if (currentBook.hasCovers === undefined) {
+                currentBook.hasCovers = currentBook.pages.some(p => p.isCover);
+            }
+            
+            // Carregar páginas
+            currentPageIndex = 0;
+            updatePageDisplay();
+        }
+
+        // FUNÇÃO PRINCIPAL PARA GERAR PDF
+        document.getElementById('download-pdf').addEventListener('click', async function() {
+            try {
+                // Validar título e autor
+                if (!currentBook.title.trim() || currentBook.title === 'Título do Livro') {
+                    alert('Por favor, preencha o título do livro antes de baixar o PDF.');
+                    bookTitleInput.focus();
+                    return;
+                }
+                
+                if (!currentBook.author.trim() || currentBook.author === 'Autor') {
+                    alert('Por favor, preencha o nome do autor antes de baixar o PDF.');
+                    bookAuthorInput.focus();
+                    return;
+                }
+                
+                this.disabled = true;
+                this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Gerando PDF...';
+                
+                const { jsPDF } = window.jspdf;
+                
+                // Definir formato baseado no tamanho escolhido
+                let pdfFormat = 'a5';
+                if (currentBook.coverSize === 'a6') pdfFormat = 'a6';
+                if (currentBook.coverSize === 'pocket') pdfFormat = [110, 180]; // pocket size em mm
+                
+                const doc = new jsPDF({
+                    orientation: 'portrait',
+                    unit: 'mm',
+                    format: pdfFormat
+                });
+                
+                const pageWidth = doc.internal.pageSize.getWidth();
+                const pageHeight = doc.internal.pageSize.getHeight();
+                
+                // 1. CAPA FRONTAL (PRIMEIRA PÁGINA)
+                doc.setFillColor(currentBook.coverColor);
+                doc.rect(0, 0, pageWidth, pageHeight, 'F');
+                
+                // Adicionar imagem se existir
+                if (currentBook.coverImage) {
+                    try {
+                        // Calcular dimensões para centralizar a imagem
+                        const imgWidth = pageWidth * 0.9;
+                        const imgHeight = pageHeight * 0.9;
+                        const x = (pageWidth - imgWidth) / 2;
+                        const y = (pageHeight - imgHeight) / 2;
+                        doc.addImage(currentBook.coverImage, 'JPEG', x, y, imgWidth, imgHeight);
+                    } catch (error) {
+                        console.warn('Erro ao adicionar imagem da capa frontal:', error);
+                    }
+                }
+                
+                // Adicionar título (sempre na capa frontal)
+                doc.setTextColor(255, 255, 255);
+                doc.setFontSize(28);
+                doc.setFont("helvetica", "bold");
+                const titleLines = doc.splitTextToSize(currentBook.title, pageWidth - 40);
+                doc.text(titleLines, pageWidth/2, pageHeight/2 - 20, { align: 'center' });
+                
+                // Adicionar autor (sempre na capa frontal)
+                doc.setFontSize(18);
+                doc.setFont("helvetica", "normal");
+                doc.text(currentBook.author, pageWidth/2, pageHeight/2 + 20, { align: 'center' });
+                
+                // 2. CONTEÚDO DO LIVRO (apenas páginas que NÃO são capas)
+                for (let i = 0; i < currentBook.pages.length; i++) {
+                    const page = currentBook.pages[i];
+                    
+                    // Pular páginas de capa (já fizemos manualmente)
+                    if (page.isCover) {
+                        continue;
+                    }
+                    
+                    doc.addPage();
+                    
+                    if (page.type === 'image' && page.imageData) {
+                        // Página com imagem
+                        try {
+                            doc.addImage(page.imageData, 'JPEG', 10, 10, pageWidth - 20, pageHeight - 20);
+                        } catch (error) {
+                            doc.setFontSize(12);
+                            doc.text("Imagem não pode ser carregada", 10, 20);
+                        }
+                    } else if (page.type === 'drawing' && page.canvasData) {
+                        // Página com desenho
+                        try {
+                            doc.addImage(page.canvasData, 'JPEG', 10, 10, pageWidth - 20, pageHeight - 20);
+                        } catch (error) {
+                            doc.setFontSize(12);
+                            doc.text("Desenho não pode ser carregado", 10, 20);
+                        }
+                    } else {
+                        // Página com texto (lined, introduction, toc, conclusion)
+                        const tempDiv = document.createElement('div');
+                        tempDiv.innerHTML = page.content;
+                        const text = tempDiv.textContent || tempDiv.innerText || '';
+                        
+                        if (text.trim()) {
+                            doc.setFontSize(12);
+                            doc.setTextColor(0, 0, 0);
+                            const lines = doc.splitTextToSize(text, pageWidth - 20);
+                            doc.text(lines, 10, 20);
+                        } else {
+                            doc.setFontSize(12);
+                            doc.text("Página em branco", pageWidth/2, pageHeight/2, { align: 'center' });
+                        }
+                    }
+                }
+                
+                // 3. CAPA TRASEIRA (ÚLTIMA PÁGINA)
+                doc.addPage();
+                doc.setFillColor(currentBook.coverColor);
+                doc.rect(0, 0, pageWidth, pageHeight, 'F');
+                
+                // Adicionar imagem da capa traseira se existir
+                if (currentBook.backCoverImage) {
+                    try {
+                        // Calcular dimensões para centralizar a imagem
+                        const imgWidth = pageWidth * 0.9;
+                        const imgHeight = pageHeight * 0.9;
+                        const x = (pageWidth - imgWidth) / 2;
+                        const y = (pageHeight - imgHeight) / 2;
+                        doc.addImage(currentBook.backCoverImage, 'JPEG', x, y, imgWidth, imgHeight);
+                    } catch (error) {
+                        console.warn('Erro ao adicionar imagem da capa traseira:', error);
+                    }
+                }
+                
+                // Adicionar texto da capa traseira apenas se o usuário escreveu algo
+                if (currentBook.backCoverText && currentBook.backCoverText.trim()) {
+                    doc.setTextColor(255, 255, 255);
+                    doc.setFontSize(16);
+                    doc.setFont("helvetica", "normal");
+                    const backCoverLines = doc.splitTextToSize(currentBook.backCoverText, pageWidth - 40);
+                    doc.text(backCoverLines, pageWidth/2, 50, { align: 'center' });
+                }
+                
+                // SALVAR PDF
+                const fileName = `${currentBook.title.replace(/[^\w\s]/gi, '').replace(/\s+/g, '_')}_livro.pdf`;
+                doc.save(fileName);
+                
+                alert('✅ PDF gerado com sucesso!\n• Capa frontal: Página 1\n• Conteúdo: Páginas intermediárias\n• Capa traseira: Última página');
+                
+            } catch (error) {
+                console.error('Erro ao gerar PDF:', error);
+                alert('❌ Erro ao gerar PDF: ' + error.message);
+            } finally {
+                this.disabled = false;
+                this.innerHTML = '<i class="fas fa-download"></i> Baixar Livro em PDF';
+            }
+        });
+
+        // Adicionar alerta se tentar sair com alterações não salvas
+        window.addEventListener('beforeunload', (e) => {
+            if (hasUnsavedChanges) {
+                e.preventDefault();
+                e.returnValue = 'Você tem alterações não salvas no livro. Tem certeza que deseja sair?';
+            }
+        });
+
+        // Inicializar aplicação
+        checkLogin();
+        initColorPicker();
+        initSizeOptions();
+        initNewBook();
+    </script>
+</body>
+</html>
